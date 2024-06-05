@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 
 st.set_page_config(layout='wide', page_title='Startup Analysis')
-df = pd.read_csv('Startups_cleaned.xls')
+df = pd.read_csv('startups_cleaned.xls')
 df['date'] = pd.to_datetime(df['date'], errors='coerce')
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
@@ -19,11 +19,11 @@ def load_overall_analysis():
     st.title('Overall Analysis')
 
     # total invested amount
-    total = round(df['amount'].sum())
+    total = round(df['Amount in Crores'].sum())
     # max amount infused in a startup
-    max_funding = df.groupby('startup')['amount'].max().sort_values(ascending=False).head(1).values[0]
+    max_funding = df.groupby('startup')['Amount in Crores'].max().sort_values(ascending=False).head(1).values[0]
     # avg ticket size
-    avg_funding = df.groupby('startup')['amount'].sum().mean()
+    avg_funding = df.groupby('startup')['Amount in Crores'].sum().mean()
     # total funded startup
     num_startups = df['startup'].nunique()
 
@@ -42,15 +42,15 @@ def load_overall_analysis():
         st.header('MoM graph')
         selected_option = st.selectbox('Select Type', ['Total', 'count'])
         if selected_option == 'total':
-            temp_df = df.groupby(['year', 'month'])['amount'].sum().reset_index()
+            temp_df = df.groupby(['year', 'month'])['Amount in Crores'].sum().reset_index()
         else:
-            temp_df = df.groupby(['year', 'month'])['amount'].count().reset_index()
+            temp_df = df.groupby(['year', 'month'])['Amount in Crores'].count().reset_index()
 
-        temp_df['x_axis'] = temp_df['month'].astype('str') + '_' + temp_df['year'].astype('str')
+        temp_df['x_axis'] = temp_df['Amount in Crores'].astype('str') + '_' + temp_df['year'].astype('str')
 
         # Create plot
         fig5, ax = plt.subplots()
-        ax.plot(temp_df['x_axis'], temp_df['amount'])
+        ax.plot(temp_df['x_axis'], temp_df['Amount in Crores'])
 
         # Set plot labels and title
         ax.set_xlabel('Month-Year')
@@ -64,9 +64,9 @@ def load_overall_analysis():
         st.header('Top sectors')
         sector_option = st.selectbox('select Type ', ['total', 'count'])
         if sector_option == 'total':
-            tmp_df = df.groupby(['vertical'])['amount'].sum().sort_values(ascending=False).head(5)
+            tmp_df = df.groupby(['vertical'])['Amount in Crores'].sum().sort_values(ascending=False).head(5)
         else:
-            tmp_df = df.groupby(['vertical'])['amount'].count().sort_values(ascending=False).head(5)
+            tmp_df = df.groupby(['vertical'])['Amount in Crores'].count().sort_values(ascending=False).head(5)
 
         fig7, ax7 = plt.subplots()
         ax7.pie(tmp_df, labels=tmp_df.index, autopct="%0.01f%%")
@@ -109,7 +109,7 @@ def load_overall_analysis():
         st.pyplot(fig)
 
     st.header('Funding Heatmap')
-    table = pd.crosstab(df['year'], df['round'], values=df['amount'], aggfunc='sum')
+    table = pd.crosstab(df['year'], df['round'], values=df['Amount in Crores'], aggfunc='sum')
     fig, ax = plt.subplots(figsize=(20,5))
     sns.heatmap(table,  cmap=custom_palette, vmin=0, vmax=1, annot_kws={"size": 14},
                 ax=ax)
@@ -122,14 +122,14 @@ def load_investor_details(investor):
     st.title(investor)
     # load the recent five investment of the investor
     lasts_5df = df[df['investors'].str.contains(investor)].head()[
-        ['date', 'startup', 'vertical', 'city', 'round', 'amount']]
+        ['date', 'startup', 'vertical', 'city', 'round', 'Amount in Crores']]
     st.subheader('Most Recent Investment')
     st.dataframe(lasts_5df)
 
     # biggest investment
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        big_series = df[df['investors'].str.contains(investor)].groupby('startup')['amount'].sum().sort_values(
+        big_series = df[df['investors'].str.contains(investor)].groupby('startup')['Amount in Crores'].sum().sort_values(
             ascending=False).head()
         st.subheader('Biggest Investment')
         fig, ax = plt.subplots()
@@ -137,21 +137,21 @@ def load_investor_details(investor):
         st.pyplot(fig)
 
     with col2:
-        vertical_series = df[df['investors'].str.contains(investor)].groupby('vertical')['amount'].sum()
+        vertical_series = df[df['investors'].str.contains(investor)].groupby('vertical')['Amount in Crores'].sum()
         st.subheader('Sectors Invested in')
         fig1, ax1 = plt.subplots()
         ax1.pie(vertical_series, labels=vertical_series.index, autopct="%0.01f%%")
         st.pyplot(fig1)
 
     with col3:
-        round_series = df[df['investors'].str.contains(investor)].groupby('round')['amount'].sum()
+        round_series = df[df['investors'].str.contains(investor)].groupby('round')['Amount in Crores'].sum()
         st.subheader('Round Invested in')
         fig2, ax2 = plt.subplots()
         ax2.pie(round_series, labels=round_series.index, autopct="%0.01f%%")
         st.pyplot(fig2)
 
     with col4:
-        city_series = df[df['investors'].str.contains(investor)].groupby('city')['amount'].sum()
+        city_series = df[df['investors'].str.contains(investor)].groupby('city')['Amount in Crores'].sum()
         st.subheader('city Invested in')
         fig3, ax3 = plt.subplots()
         ax3.pie(city_series, labels=city_series.index, autopct="%0.01f%%")
@@ -160,14 +160,14 @@ def load_investor_details(investor):
     col5, col6 = st.columns(2)
     with col5:
         df['Year'] = df['date'].dt.year
-        year_series = df[df['investors'].str.contains(investor)].groupby('Year')['amount'].sum()
+        year_series = df[df['investors'].str.contains(investor)].groupby('Year')['Amount in Crores'].sum()
         st.subheader('YOY Investment')
         fig4, ax4 = plt.subplots()
         ax4.plot(year_series.index, year_series.values)
         st.pyplot(fig4)
 
     with col6:
-        similar_investors = df[df['investors'].str.contains(investor)].groupby('subvertical')['amount'].sum()
+        similar_investors = df[df['investors'].str.contains(investor)].groupby('subvertical')['Amount in Crores'].sum()
         st.subheader('similar investor')
         fig6, ax6 = plt.subplots()
         ax6.pie(similar_investors, labels=similar_investors.index, autopct="%0.01f%%")
@@ -184,7 +184,7 @@ def load_startup_details(startup):
         st.dataframe(industry_series)
 
     with col2:
-        inv_series = df[df['startup'].str.contains(startup)].groupby('investors').sum()
+        inv_series = df[df['startup'].str.contains("mamaearth")].groupby('investors').sum(numeric_only=True)
         st.subheader('investors')
         st.dataframe(inv_series)
 
