@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 
 st.set_page_config(layout='wide', page_title='Startup Analysis')
-df = pd.read_csv('startups_cleaned.xls')
+df = pd.read_csv('Startups_cleaned.xls')
 df['date'] = pd.to_datetime(df['date'], errors='coerce')
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
